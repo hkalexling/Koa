@@ -1,0 +1,16 @@
+name: koa
+version: 0.1.0
+
+authors:
+  - Alex Ling <hkalexling@gmail.com>
+
+crystal: 0.35.1
+
+license: MIT
+
+dependencies:
+  open_api:
+    github: jreinert/open_api.cr
+    commit: 95e4df2ca10b1fe88b8b35c62a18b06a10267b6c
+  kemal:
+    github: kemalcr/kemal

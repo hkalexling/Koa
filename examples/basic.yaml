@@ -1,0 +1,130 @@
+---
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+servers:
+- url: 127.0.0.1:3000
+paths:
+  /user:
+    get:
+      tags:
+      - user
+      summary: Lists all users
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userAry'
+    post:
+      tags:
+      - user
+      - auth
+      summary: Creates a new user
+      requestBody:
+        description: A JSON string containing the new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/$user'
+        required: true
+      responses:
+        "200":
+          description: OK
+      security:
+      - cookie: []
+      - basic: []
+  /user/{id}:
+    get:
+      tags:
+      - user
+      summary: Returns a user with `id`
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        "404":
+          description: User not found
+  /user/{username}:
+    get:
+      tags:
+      - user
+      summary: Returns a user with `username`
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        "404":
+          description: User not found
+  /profile_pic/{id}:
+    get:
+      tags:
+      - user
+      summary: Returns the profile picture of a user with `id`
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              schema:
+                $ref: '#/components/schemas/image'
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        friends:
+          $ref: '#/components/schemas/userAry'
+    userAry:
+      type: array
+      items:
+        $ref: '#/components/schemas/user'
+    image:
+      type: string
+      description: An image
+      format: binary
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    cookie:
+      type: apiKey
+      name: session-id
+      in: cookie
+    basic:
+      type: http
+      scheme: basic
+  links: {}
+  callbacks: {}
