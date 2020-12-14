@@ -43,7 +43,14 @@ struct Koa
   def self.object(name : String, schema : Hash(String, String), *,
                   desc : String? = nil)
     props = {} of String => OpenAPI::Schema | OpenAPI::Reference
+    requires = [] of String
     schema.each do |key, type|
+      if type.ends_with? "?"
+        type = type[0..-2]
+      else
+        requires << key
+      end
+
       if type.starts_with? "$"
         prop = OpenAPI.reference ref: "#/components/schemas/#{type[1..-1]}"
       else
@@ -52,7 +59,7 @@ struct Koa
       props[key] = prop
     end
     @@schemas[name] = OpenAPI.schema type: "object", description: desc,
-      properties: props
+      properties: props, required: requires
   end
 
   # Defines a binary schema
