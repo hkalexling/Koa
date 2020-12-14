@@ -54,7 +54,11 @@ struct Koa
   # Specifies the required request body of the succeeding route.
   def self.body(type : String, *, required = true, desc : String? = nil,
                 ref : String? = nil)
-    schema = ref ? OpenAPI.reference ref: "#/components/schemas/#{ref}" : nil
+    schema = nil
+    if ref
+      ref = ref[1..-1] if ref.starts_with? "$"
+      schema = OpenAPI.reference ref: "#/components/schemas/#{ref}"
+    end
     @@temp_hash["body"] = OpenAPI.request_body description: desc,
       required: required, content: {type => OpenAPI.media_type schema: schema}
   end
