@@ -7,6 +7,9 @@ Koa.server "127.0.0.1:3000"
 
 Koa.cookie_auth "cookie", "session-id"
 Koa.basic_auth "basic"
+
+Koa.global_tag "user", desc: "Operations on users"
+
 Koa.object "user", {"id" => "string", "username" => "string", "friends" => "$userAry"}
 Koa.array "userAry", "$user"
 Koa.binary "image", desc: "An image"

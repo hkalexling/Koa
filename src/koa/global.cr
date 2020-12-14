@@ -67,4 +67,8 @@ struct Koa
     @@schemas[name] = OpenAPI.schema type: "string", description: desc,
       format: "binary"
   end
+
+  def self.global_tag(name : String, *, desc : String? = nil)
+    @@tags << OpenAPI.tag name: name, description: desc
+  end
 end

@@ -28,7 +28,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/$user'
+              $ref: '#/components/schemas/user'
         required: true
       responses:
         "200":
@@ -97,6 +97,10 @@ paths:
 components:
   schemas:
     user:
+      required:
+      - id
+      - username
+      - friends
       type: object
       properties:
         id:
@@ -128,3 +132,6 @@ components:
       scheme: basic
   links: {}
   callbacks: {}
+tags:
+- name: user
+  description: Operations on users
