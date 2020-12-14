@@ -24,8 +24,8 @@ struct Koa
   # Adds a response to the succeeding route.
   #
   # The response {"200" => "OK"} is automatically added, and you can overwrite it with `Koa.response "200", "New description"`.
-  def self.response(status : UInt32, desc : String, *, ref : String? = nil,
-                    media_type = "application/json")
+  def self.response(status : UInt32, desc : String = "OK", *,
+                    ref : String? = nil, media_type = "application/json")
     @@temp_hash["responses"] = {"200" => OpenAPI.response description: "OK"} \
       unless @@temp_hash["responses"]?
 
@@ -52,8 +52,8 @@ struct Koa
   end
 
   # Specifies the required request body of the succeeding route.
-  def self.body(type : String, *, required = true, desc : String? = nil,
-                ref : String? = nil)
+  def self.body(*, type = "application/json", required = true,
+                desc : String? = nil, ref : String? = nil)
     schema = nil
     if ref
       ref = ref[1..-1] if ref.starts_with? "$"

@@ -14,13 +14,13 @@ Koa.binary "image", desc: "An image"
 # Route definitions
 Koa.describe "Lists all users"
 Koa.tag "user"
-Koa.response 200, "OK", ref: "$userAry"
+Koa.response 200, ref: "$userAry"
 get "/user" do |env|
 end
 
 Koa.describe "Returns a user with `id`"
 Koa.response 404, "User not found"
-Koa.response 200, "OK", ref: "$user"
+Koa.response 200, ref: "$user"
 Koa.tag "user"
 Koa.path "id", type: "integer"
 get "/user/:id" do |env|
@@ -28,7 +28,7 @@ end
 
 Koa.describe "Returns a user with `username`"
 Koa.response 404, "User not found"
-Koa.response 200, "OK", ref: "$user"
+Koa.response 200, ref: "$user"
 Koa.tag "user"
 get "/user/:username" do |env|
 end
@@ -36,15 +36,14 @@ end
 Koa.describe "Creates a new user"
 Koa.tags ["user", "auth"]
 Koa.auth ["cookie", "basic"]
-Koa.body "application/json", desc: "A JSON string containing the new user",
-  ref: "$user"
+Koa.body desc: "A JSON string containing the new user", ref: "$user"
 post "/user" do |env|
 end
 
 Koa.describe "Returns the profile picture of a user with `id`"
 Koa.tag "user"
 Koa.path "id", type: "integer"
-Koa.response 200, "OK", ref: "$image", media_type: "image/*"
+Koa.response 200, ref: "$image", media_type: "image/*"
 get "/profile_pic/{id}" do |env|
 end
 
