@@ -2,6 +2,7 @@ struct Koa
   # Initializes Koa and sets the `Info` object of the API.
   def self.init(title : String, *, desc : String? = nil, version = "1.0.0")
     @@info = OpenAPI.info title: title, description: desc, version: version
+    @@path.clear
   end
 
   # Adds a server to the server list.
