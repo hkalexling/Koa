@@ -17,7 +17,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/userAry'
+                type: array
+                items:
+                  $ref: '#/components/schemas/user'
     post:
       tags:
       - user
@@ -47,6 +49,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int32
       responses:
         "200":
           description: OK
@@ -76,6 +79,33 @@ paths:
                 $ref: '#/components/schemas/user'
         "404":
           description: User not found
+  /user/search:
+    get:
+      tags:
+      - user
+      summary: Returns a list of users matching `query`
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                required:
+                - users
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/user'
+                  error:
+                    type: string
   /profile_pic/{id}:
     get:
       tags:
@@ -87,6 +117,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int32
       responses:
         "200":
           description: OK
@@ -96,6 +127,30 @@ paths:
                 $ref: '#/components/schemas/image'
 components:
   schemas:
+    image:
+      type: string
+      format: binary
+    matrix:
+      type: array
+      items:
+        type: array
+        items:
+          type: integer
+          format: int32
+    points:
+      type: array
+      items:
+        required:
+        - longitude
+        - latitude
+        type: object
+        properties:
+          longitude:
+            type: integer
+            format: int32
+          latitude:
+            type: integer
+            format: int32
     user:
       required:
       - id
@@ -108,15 +163,58 @@ components:
         username:
           type: string
         friends:
-          $ref: '#/components/schemas/userAry'
-    userAry:
-      type: array
-      items:
-        $ref: '#/components/schemas/user'
-    image:
-      type: string
-      description: An image
-      format: binary
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
+    post:
+      required:
+      - id
+      - author
+      - metadata
+      - content
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          $ref: '#/components/schemas/user'
+        metadata:
+          required:
+          - timestamp
+          - location
+          - nsfw
+          type: object
+          properties:
+            timestamp:
+              type: integer
+              format: int64
+            location:
+              $ref: '#/components/schemas/points'
+            nsfw:
+              type: boolean
+        content:
+          required:
+          - text
+          - media
+          type: object
+          properties:
+            text:
+              type: string
+            media:
+              type: object
+              properties:
+                video:
+                  type: array
+                  items:
+                    type: string
+                audio:
+                  type: array
+                  items:
+                    type: string
+                image:
+                  type: array
+                  items:
+                    type: string
   responses: {}
   parameters: {}
   examples: {}

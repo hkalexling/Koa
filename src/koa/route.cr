@@ -25,15 +25,14 @@ struct Koa
   #
   # The response {"200" => "OK"} is automatically added, and you can overwrite it with `Koa.response "200", "New description"`.
   def self.response(status : UInt32, desc : String = "OK", *,
-                    ref : String? = nil, media_type = "application/json")
+                    schema : Type? = nil, media_type = "application/json")
     @@temp_hash["responses"] = {"200" => OpenAPI.response description: "OK"} \
       unless @@temp_hash["responses"]?
 
     content = nil
-    if ref
-      ref = ref[1..-1] if ref.starts_with? "$"
-      schema = OpenAPI.reference ref: "#/components/schemas/#{ref}"
-      content = {media_type => OpenAPI.media_type schema: schema}
+    if schema
+      _schema = parse_type(schema)[:schema]
+      content = {media_type => OpenAPI.media_type schema: _schema}
     end
 
     @@temp_hash["responses"].as(Hash(String, OpenAPI::Response))[status.to_s] =
@@ -52,23 +51,24 @@ struct Koa
   end
 
   # Specifies the required request body of the succeeding route.
-  def self.body(*, type = "application/json", required = true,
-                desc : String? = nil, ref : String? = nil)
-    schema = nil
-    if ref
-      ref = ref[1..-1] if ref.starts_with? "$"
-      schema = OpenAPI.reference ref: "#/components/schemas/#{ref}"
+  def self.body(*, media_type = "application/json", required = true,
+                desc : String? = nil, schema : Type? = nil)
+    _schema = nil
+    if schema
+      _schema = parse_type(schema)[:schema]
     end
+
     @@temp_hash["body"] = OpenAPI.request_body description: desc,
-      required: required, content: {type => OpenAPI.media_type schema: schema}
+      required: required,
+      content: {media_type => OpenAPI.media_type schema: _schema}
   end
 
   {% for type in %w(query path header cookie) %}
   # Adds a {{type.id}} parameter to the succeeding route.
   def self.{{type.id}}(name : String, *, desc : String? = nil, required = true,
-                      type : String = "string", low_priority = false)
+                       schema : PrimitiveType = String, low_priority = false)
     param = OpenAPI.parameter name: name, in: {{type}}, description: desc,
-      required: required, schema: OpenAPI.schema type: type
+      required: required, schema: parse_primitive_type(schema)[:schema]
     @@temp_hash["params"] = [] of OpenAPI::Parameter \
       unless @@temp_hash["params"]?
 

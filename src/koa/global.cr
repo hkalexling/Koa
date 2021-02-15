@@ -1,4 +1,27 @@
 struct Koa
+  TYPES = {
+    String  => {"string", nil},
+    Bool    => {"boolean", nil},
+    Int32   => {"integer", "int32"},
+    Int64   => {"integer", "int64"},
+    Float32 => {"number", "float"},
+    Float64 => {"number", "double"},
+    Bytes   => {"string", "binary"},
+    Base64  => {"string", "byte"},
+  }
+
+  {% begin %}
+    alias PrimitiveType = {% for t in TYPES.keys %}
+      ({{t.id}} | Nil).class | {{t.id}}.class |
+    {% end %} String
+    alias Type = PrimitiveType | Array(Type) | Hash(String, Type)
+    #alias Type = PrimitiveType | Array(PrimitiveType) |
+      #Hash(String, Array(PrimitiveType) | PrimitiveType)
+  {% end %}
+
+  alias Schema = NamedTuple(schema: OpenAPI::Schema | OpenAPI::Reference,
+    required: Bool)
+
   # Initializes Koa and sets the `Info` object of the API.
   def self.init(title : String, *, desc : String? = nil, version = "1.0.0")
     @@info = OpenAPI.info title: title, description: desc, version: version
@@ -28,47 +51,18 @@ struct Koa
       scheme: "bearer", bearer_format: format
   end
 
-  # Defines an array schema
-  def self.array(name : String, type : String, *, desc : String? = nil)
-    if type.starts_with? "$"
-      items = OpenAPI.reference ref: "#/components/schemas/#{type[1..-1]}"
-    else
-      items = OpenAPI.schema type: type
+  # Defines a schema
+  def self.schema(name : String, type : Type, *, desc : String? = nil)
+    schema = parse_type(type, desc)[:schema]
+    if schema.is_a? OpenAPI::Reference
+      raise SchemaError.new "Schema definition cannot be a simple wrapper " \
+                            "around another schema"
     end
-    @@schemas[name] = OpenAPI.schema type: "array", description: desc,
-      items: items
+    @@schemas[name] = schema
   end
 
-  # Defines an object schema
-  def self.object(name : String, schema : Hash(String, String), *,
-                  desc : String? = nil)
-    props = {} of String => OpenAPI::Schema | OpenAPI::Reference
-    requires = [] of String
-    schema.each do |key, type|
-      if type.ends_with? "?"
-        type = type[0..-2]
-      else
-        requires << key
-      end
-
-      if type.starts_with? "$"
-        prop = OpenAPI.reference ref: "#/components/schemas/#{type[1..-1]}"
-      else
-        prop = OpenAPI.schema type: type
-      end
-      props[key] = prop
-    end
-    @@schemas[name] = OpenAPI.schema type: "object", description: desc,
-      properties: props, required: requires
-  end
-
-  # Defines a binary schema
-  def self.binary(name : String, *, desc : String? = nil)
-    @@schemas[name] = OpenAPI.schema type: "string", description: desc,
-      format: "binary"
-  end
-
-  def self.global_tag(name : String, *, desc : String? = nil)
+  # Defines a tag
+  def self.define_tag(name : String, *, desc : String? = nil)
     @@tags << OpenAPI.tag name: name, description: desc
   end
 end
