@@ -26,6 +26,12 @@ Koa.schema "user", {
   "friends"  => ["user"],
 }
 
+Koa.schema "optional", {
+  "optionalNumber"  => Int32?,
+  "optionalArray"   => [Int32?],
+  "optionalObject?" => {} of String => String,
+}
+
 Koa.schema "post", {
   "id"       => String,
   "author"   => "user",

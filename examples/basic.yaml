@@ -166,6 +166,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user'
+    optional:
+      type: object
+      properties:
+        optionalNumber:
+          type: integer
+          format: int32
+        optionalArray:
+          type: array
+          items:
+            type: integer
+            format: int32
+        optionalObject:
+          type: object
+          properties: {}
     post:
       required:
       - id

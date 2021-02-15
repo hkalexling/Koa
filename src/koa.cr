@@ -66,8 +66,13 @@ struct Koa
       schemas = Hash.zip type.keys, type.values.map { |v|
         parse_type(v).as Schema
       }
-      props = Hash.zip schemas.keys, schemas.values.map &.[:schema]
-      requires = schemas.select { |_, s| s[:required] }.keys
+      props = Hash.zip schemas.keys.map &.rstrip("?"),
+        schemas.values.map &.[:schema]
+      requires = schemas
+        .select do |k, v|
+          v[:required] && !k.ends_with? "?"
+        end
+        .keys
       requires = nil if requires.empty?
       schema = OpenAPI.schema type: "object", properties: props,
         required: requires
