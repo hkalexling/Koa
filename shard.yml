@@ -4,13 +4,13 @@ version: 0.7.0
 authors:
   - Alex Ling <hkalexling@gmail.com>
 
-crystal: 0.35.1
+crystal: 1.0.0
 
 license: MIT
 
 dependencies:
   open_api:
-    github: jreinert/open_api.cr
-    commit: 95e4df2ca10b1fe88b8b35c62a18b06a10267b6c
+    github: hkalexling/open_api.cr
+    branch: master
   kemal:
     github: kemalcr/kemal
