@@ -41,7 +41,14 @@ struct Koa
       required = !type.nilable?
     {% end %}
     when String
-      schema = OpenAPI.reference ref: "#/components/schemas/#{type.lstrip "$"}"
+      ref_ary = type.split("|").map do |t|
+        OpenAPI.reference ref: "#/components/schemas/#{t.strip.lstrip "$"}"
+      end
+      if ref_ary.size > 1
+        schema = OpenAPI.schema one_of: ref_ary
+      else
+        schema = ref_ary.first
+      end
       required = !type.ends_with? "?"
     else
       raise SchemaError.new "Unknow schema type #{type}"

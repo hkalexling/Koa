@@ -15,8 +15,6 @@ struct Koa
       ({{t.id}} | Nil).class | {{t.id}}.class |
     {% end %} String
     alias Type = PrimitiveType | Array(Type) | Hash(String, Type)
-    #alias Type = PrimitiveType | Array(PrimitiveType) |
-      #Hash(String, Array(PrimitiveType) | PrimitiveType)
   {% end %}
 
   alias Schema = NamedTuple(schema: OpenAPI::Schema | OpenAPI::Reference,
